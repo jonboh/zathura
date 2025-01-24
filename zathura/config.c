@@ -537,6 +537,8 @@ void config_load_default(zathura_t* zathura) {
   girara_inputbar_command_add(gsession, "jumplist",   NULL,   cmd_jumplist_list,   NULL,         _("Show recent jumps in jumplist"));
   girara_inputbar_command_add(gsession, "close",      NULL,   cmd_close,           NULL,         _("Close current file"));
   girara_inputbar_command_add(gsession, "info",       NULL,   cmd_info,            NULL,         _("Show file information"));
+  girara_inputbar_command_add(gsession, "position",   NULL,   cmd_position,        NULL,         _("Show current position"));
+  girara_inputbar_command_add(gsession, "position_link",   NULL,   cmd_position_link,        NULL,         _("Generate position link"));
   girara_inputbar_command_add(gsession, "exec",       NULL,   cmd_exec,            NULL,         _("Execute a command"));
   girara_inputbar_command_add(gsession, "!",          NULL,   cmd_exec,            NULL,         _("Execute a command")); /* like vim */
   girara_inputbar_command_add(gsession, "help",       NULL,   cmd_help,            NULL,         _("Show help"));

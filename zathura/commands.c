@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: Zlib */
 
 #include <glib/gi18n.h>
+#include <locale.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -254,6 +255,79 @@ bool cmd_info(girara_session_t* session, girara_list_t* UNUSED(argument_list)) {
         g_string_append_printf(string, "<b>%s:</b> %s\n", meta_fields[i].name, entry->value);
       }
     }
+  }
+
+  if (string->len > 0) {
+    g_string_erase(string, string->len - 1, 1);
+    girara_notify(session, GIRARA_INFO, "%s", string->str);
+  } else {
+    girara_notify(session, GIRARA_INFO, _("No information available."));
+  }
+
+  g_string_free(string, TRUE);
+
+  return false;
+}
+
+bool cmd_position(girara_session_t* session, girara_list_t* UNUSED(argument_list)) {
+  g_return_val_if_fail(session != NULL, false);
+  g_return_val_if_fail(session->global.data != NULL, false);
+  zathura_t* zathura = session->global.data;
+  if (zathura_has_document(zathura) == false) {
+    girara_notify(session, GIRARA_ERROR, _("No document opened."));
+    return false;
+  }
+
+
+  GString* string = g_string_new(NULL);
+
+  zathura_document_t* document = zathura_get_document(zathura);
+  double position_x            = zathura_document_get_position_x(document);
+  double position_y            = zathura_document_get_position_y(document);
+
+  g_string_append_printf(string, "<b>pos_x:</b> %.17g\n", position_x);
+  g_string_append_printf(string, "<b>pos_y:</b> %.17g\n", position_y);
+
+  if (string->len > 0) {
+    g_string_erase(string, string->len - 1, 1);
+    girara_notify(session, GIRARA_INFO, "%s", string->str);
+  } else {
+    girara_notify(session, GIRARA_INFO, _("No information available."));
+  }
+
+  g_string_free(string, TRUE);
+
+  return false;
+}
+
+bool cmd_position_link(girara_session_t* session, girara_list_t* UNUSED(argument_list)) {
+  g_return_val_if_fail(session != NULL, false);
+  g_return_val_if_fail(session->global.data != NULL, false);
+  zathura_t* zathura = session->global.data;
+  if (zathura_has_document(zathura) == false) {
+    girara_notify(session, GIRARA_ERROR, _("No document opened."));
+    return false;
+  }
+
+
+  GString* string = g_string_new(NULL);
+
+  zathura_document_t* document = zathura_get_document(zathura);
+  double position_x            = zathura_document_get_position_x(document);
+  double position_y            = zathura_document_get_position_y(document);
+  char* file_path = get_formatted_filename(zathura, true);
+
+  // Set the locale to "C" for number formatting
+  char *old_locale = setlocale(LC_NUMERIC, NULL); // Save the current locale
+  if (old_locale != NULL) {
+      old_locale = strdup(old_locale);
+      setlocale(LC_NUMERIC, "C");
+  }
+  g_string_append_printf(string, "%s#pos_x=%.17g&amp;pos_y=%.17g\n", file_path, position_x, position_y);
+  // Restore the previous locale
+  if (old_locale != NULL) {
+      setlocale(LC_NUMERIC, old_locale);
+      free(old_locale);
   }
 
   if (string->len > 0) {

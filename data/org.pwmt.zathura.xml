@@ -45,6 +45,17 @@
       <arg type='u' name='column' direction='in' />
       <arg type='b' name='return' direction='out' />
     </method>
+
+    <method name='Scroll'>
+      <arg type='i' name='argument' direction='in' />
+      <arg type='b' name='return' direction='out' />
+    </method>
+
+    <method name='SetPosition'>
+      <arg type='d' name='pos_x' direction='in' />
+      <arg type='d' name='pos_y' direction='in' />
+      <arg type='b' name='return' direction='out' />
+    </method>
     <!-- Execute a command as if entered in the inputbar. -->
     <method name='ExecuteCommand'>
       <arg type='s' name='input' direction='in' />

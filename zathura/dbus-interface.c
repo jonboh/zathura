@@ -10,6 +10,7 @@
 #include "synctex.h"
 #include "utils.h"
 #include "zathura.h"
+#include "zathura/shortcuts.h"
 
 #include <gio/gio.h>
 #include <girara/commands.h>
@@ -428,6 +429,59 @@ static void handle_source_config_from_dir(zathura_t* zathura, GVariant* paramete
   g_dbus_method_invocation_return_value(invocation, result);
 }
 
+static void
+handle_scroll(zathura_t* zathura, GVariant* parameters,
+                 GDBusMethodInvocation* invocation)
+{
+  /*
+  Usage:
+
+  #+begin_src shell
+    dbus-send --type="method_call" --print-reply \
+    --dest=org.pwmt.zathura.PID-${pid} \
+    /org/pwmt/zathura org.pwmt.zathura.Scroll int32:${n}
+  #+end_src
+
+  n = 2 ... LEFT
+  n = 3 ... RIGHT
+  n = 4 ... UP
+  n = 5 ... DOWN
+  n = 6 ... BOTTOM
+  n = 7 ... TOP
+
+  More to be found in the block `enum..` in `zathura.h`.
+  */
+
+  girara_session_t*  session  = zathura->ui.session ;
+  girara_argument_t  argument                       ;
+  girara_event_t*    event    = NULL                ;
+  unsigned int       t        = 1                   ; // number of execution
+
+  g_variant_get(parameters, "(i)", &(argument.n));
+  argument.data = NULL;
+
+  bool ret = true;
+  sc_scroll(session,&argument,event,t);
+
+  GVariant* result = g_variant_new("(b)", ret);
+  g_dbus_method_invocation_return_value(invocation, result);
+}
+
+static void
+handle_set_position(zathura_t* zathura, GVariant* parameters,
+                 GDBusMethodInvocation* invocation)
+{
+  double pos_x;
+  double pos_y;
+
+  g_variant_get(parameters, "(dd)", &pos_x, &pos_y);
+
+  bool ret = true;
+  position_set(zathura, pos_x, pos_y);
+
+  GVariant* result = g_variant_new("(b)", ret);
+  g_dbus_method_invocation_return_value(invocation, result);
+}
 static void handle_method_call(GDBusConnection* UNUSED(connection), const gchar* UNUSED(sender),
                                const gchar* object_path, const gchar* interface_name, const gchar* method_name,
                                GVariant* parameters, GDBusMethodInvocation* invocation, void* data) {
@@ -447,6 +501,8 @@ static void handle_method_call(GDBusConnection* UNUSED(connection), const gchar*
       {"GotoPage", handle_goto_page, true, true},
       {"HighlightRects", handle_highlight_rects, true, true},
       {"SynctexView", handle_synctex_view, true, true},
+      {"Scroll", handle_scroll, true, true},
+      {"SetPosition", handle_set_position, true, true},
       {"ExecuteCommand", handle_execute_command, false, false},
       {"SourceConfig", handle_source_config, false, false},
       {"SourceConfigFromDirectory", handle_source_config_from_dir, false, false},
@@ -476,6 +532,7 @@ static void handle_method_call(GDBusConnection* UNUSED(connection), const gchar*
     return;
   }
 }
+
 
 static void json_document_info_add_node(JsonBuilder* builder, girara_tree_node_t* index) {
   girara_list_t* list = girara_node_get_children(index);

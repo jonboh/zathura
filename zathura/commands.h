@@ -70,6 +70,24 @@ bool cmd_close(girara_session_t* session, girara_list_t* argument_list);
 bool cmd_info(girara_session_t* session, girara_list_t* argument_list);
 
 /**
+ * Display current position
+ *
+ * @param session The used girara session
+ * @param argument_list List of passed arguments
+ * @return true if no error occurred
+ */
+bool cmd_position(girara_session_t* session, girara_list_t* argument_list);
+
+/**
+ * Display current position as a file link
+ *
+ * @param session The used girara session
+ * @param argument_list List of passed arguments
+ * @return true if no error occurred
+ */
+bool cmd_position_link(girara_session_t* session, girara_list_t* argument_list);
+
+/**
  * Display help
  *
  * @param session The used girara session
