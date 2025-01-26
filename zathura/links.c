@@ -236,7 +236,7 @@ void zathura_link_evaluate(zathura_t* zathura, zathura_link_t* link) {
 #ifndef WITH_SANDBOX
   case ZATHURA_LINK_GOTO_REMOTE:
     girara_debug("Going to remote destination: %s", link->target.value);
-    link_remote(zathura, link->target.value);
+    link_launch(zathura, link);
     break;
   case ZATHURA_LINK_URI:
     girara_debug("Opening URI: %s", link->target.value);
